@@ -28,15 +28,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-DATASET_RESULTS_PATH = os.path.join(os.path.dirname(__file__), "dataset_results.json")
-
+# Root-level health check (helpful for debugging)
+@app.get("/")
+async def root_health():
+    return {"status": "online", "message": "Eczema Severity Analyzer API is running"}
 
 @app.get("/api/health")
+@app.get("/api/health/")
 async def health_check():
     return {"status": "healthy", "service": "Eczema Severity Analyzer"}
 
+DATASET_RESULTS_PATH = os.path.join(os.path.dirname(__file__), "dataset_results.json")
 
 @app.get("/api/config")
+@app.get("/api/config/")
 async def get_config():
     return {
         "severity_thresholds": SEVERITY_THRESHOLDS,
@@ -46,6 +51,7 @@ async def get_config():
 
 
 @app.post("/api/analyze")
+@app.post("/api/analyze/")
 async def analyze_uploaded_image(file: UploadFile = File(...)):
     """Analyze an uploaded eczema image and return severity results."""
     allowed_types = ["image/jpeg", "image/png", "image/webp", "image/jpg"]
